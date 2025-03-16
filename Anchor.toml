@@ -1,0 +1,19 @@
+[toolchain]
+
+[features]
+resolution = true
+skip-lint = false
+
+[programs.localnet]
+voting_contract = "Hungg8bvpJJTEmCxn8Q3KFGheiHuzd3jTXiX5hRmYxWC"
+voting_program = "4HxCSZ53BqaxPWtyToZw2zSKshUq4jY3o8yAS2r3D9r4"
+
+[registry]
+url = "https://api.apr.dev"
+
+[provider]
+cluster = "Localnet"
+wallet = "~/.config/solana/id.json"
+
+[scripts]
+test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"

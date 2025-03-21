@@ -12,13 +12,13 @@ så ser du var din private key är.
 anchor build
 
 anchor keys list 
-använd nyckeln för declare_id!("nyckel"); i programs/voting_program/src/lib.rs. Detta är vart kontrakten skrivs och själva "programmet".
-
-anchor deploy
-om du ska lägga till nya contract på blockkedjan. det behövs om du inte tidigare gjort det.
+använd nyckeln för declare_id!("nyckel"); i programs/voting_program/src/lib.rs. Detta är vart kontrakten skrivs och själva "programmet". Uppdatera själva Anchor.toml voting_program = "key" till den nyckeln också.
 
 solana-test-validator
 för att köra igång blockkedjan. denna måste vara igång i egen terminal.
+
+anchor deploy
+om du ska lägga till nya contract på blockkedjan. det behövs om du inte tidigare gjort det.
 
 solana program show --programs
 för att se körande program.

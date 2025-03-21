@@ -14,20 +14,17 @@ describe("voting_program", () => {
     let voterAccount = anchor.web3.Keypair.generate();
 
     it("Creates a vote account", async () => {
-        try {
-            await program.methods
-            .createVoteAccount()
-            .accounts({
-                voteAccount: voteAccount.publicKey,
-                user: provider.wallet.publicKey,
-                
-            })
-            .signers([voteAccount])
-            .rpc();
-            const voteState = await program.account.voteAccount.fetch(voteAccount.publicKey); 
-        } catch (err){
-            console.log(err);
-        }
+        await program.methods
+        .createVoteAccount()
+        .accounts({
+            voteAccount: voteAccount.publicKey,
+            user: provider.wallet.publicKey,
+            
+        })
+        .signers([voteAccount])
+        .rpc();
+        const voteState = await program.account.voteAccount.fetch(voteAccount.publicKey); 
+        
 
     });
 

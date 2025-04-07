@@ -1,11 +1,12 @@
 [toolchain]
+anchor_version = "0.30.1"
 
 [features]
 resolution = true
 skip-lint = false
 
 [programs.localnet]
-voting_program = "key"
+voting_program = "2xHBV84Rd8yb3ytBgiZ1eFE4P9bavBuHFiwqyKvdkvTM"
 
 [registry]
 url = "https://api.apr.dev"

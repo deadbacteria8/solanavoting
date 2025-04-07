@@ -17,6 +17,9 @@ använd nyckeln för declare_id!("nyckel"); i programs/voting_program/src/lib.rs
 solana-test-validator
 för att köra igång blockkedjan. denna måste vara igång i egen terminal.
 
+pkill -9 solana-test-validator
+för att döda validator
+
 anchor deploy
 om du ska lägga till nya contract på blockkedjan. det behövs om du inte tidigare gjort det.
 

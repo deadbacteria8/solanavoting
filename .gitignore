@@ -6,5 +6,5 @@ node_modules
 test-ledger
 .yarn
 wasm/src/*
-groth16-solana/*
+groth16-solana
 ~/.config/solana/id.json

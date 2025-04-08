@@ -1,13 +1,12 @@
 template Vote() {
-   signal private input age;
-   signal private input hasVoted;
-   signal output numberHolder;
-   signal output obligatedToVote;
-   numberHolder <== 1;
-   if(age < 18 d || hasVoted == 1) {
-      numberHolder <== 0;
-   }
-   obligatedToVote <== numberHolder;
+  signal private input voterId;
+  signal output isEligible;
+  var bla;
+  bla = 0;
+  if(voterId <= 1000 && voterId > 0) {
+    bla = 1;
+  }
+  isEligible <== bla;
  }
 
 component main = Vote();

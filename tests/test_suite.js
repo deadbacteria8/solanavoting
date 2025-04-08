@@ -1,55 +1,37 @@
 
 import * as anchor from "@coral-xyz/anchor";
-import { Program } from "@coral-xyz/anchor";
-import path from "path";
 import * as snarkjs from "snarkjs";
 import { buildBn128, utils } from "ffjavascript";
-import { Connection, Keypair, Transaction } from "@solana/web3.js";
-
-import { json } from "stream/consumers";
-import initWasm, { convert_proof } from "../wasm/pkg/wasm.js";
-import { readFile } from "fs/promises";
-import { dirname, join } from "path";
-import { fileURLToPath } from "url";
+import { Transaction } from "@solana/web3.js";
+import ProgramMethods from "./ProgramMethods/ProgramMethods.js"
+import { convert_proof } from "../wasm/pkg/wasm.js";
+import loadWasm from "./Initialization/WasmInit.js";
 import { g1Uncompressed, g2Uncompressed, to32ByteBuffer} from "./Uncompression.js"
-const { unstringifyBigInts } = utils;
+import program, {provider} from "./Initialization/AnchorProgramInit.js";
+import path, { dirname } from "path";
+import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const wasmPath = path.join(__dirname, "../circuit", "Vote.wasm");
 const zkeyPath = path.join(__dirname, "../circuit", "Vote_final.zkey");
+const { unstringifyBigInts } = utils;
+const {SendVote, CreateVoteAccount} = ProgramMethods;
+const voteAccount = anchor.web3.Keypair.generate();
 
-async function loadWasm() {
-    const wasmPath = join(__dirname, "../wasm/pkg/wasm_bg.wasm");
-    const wasmBuffer = await readFile(wasmPath);
-    await initWasm(wasmBuffer);
-}
 describe("voting_program", () => {
     before(async () => {
-        // Initialize the WASM module before any tests run
         await loadWasm();
     });
 
-    process.env.ANCHOR_PROVIDER_URL = "http://localhost:8899";
-    const provider = anchor.AnchorProvider.env();
-    anchor.setProvider(provider);
-    const program = anchor.workspace.voting_program;
-    const voteAccount = anchor.web3.Keypair.generate();
-
     it("Creates a vote account", async () => {
-        await program.methods
-        .createVoteAccount()
-        .accounts({
-            voteAccount: voteAccount.publicKey,
-        })
-        .signers([voteAccount])
-        .rpc();
+        let transaction = new Transaction();
+        const instruction = await CreateVoteAccount(program.methods, voteAccount);
+        transaction.add(instruction);
+        const signature = await provider.sendAndConfirm(transaction, [voteAccount]);
         //const voteState = await program.account.voteAccount.fetch(voteAccount.publicKey);
-
     });
-
     it("Votes for a candidate", async () => {
-
-        let input = { "a":1,"b":5 };
+        let input = { "voterId":1 };
         let { proof, publicSignals } = await snarkjs.groth16.fullProve(input, wasmPath, zkeyPath);
         let curve = await buildBn128();
         let proofProc = unstringifyBigInts(proof);
@@ -66,18 +48,8 @@ describe("voting_program", () => {
                     units: 1_400_000
                 })
             );
-            /*transaction.add(
-                anchor.web3.ComputeBudgetProgram.setComputeUnitPrice({
-                    microLamports: 2
-                })
-            );*/
-            const instruction = await program.methods
-            .submitVote(proof_a, pi_b, pi_c, publicSignalsBuffer)
-            .accounts({
-                voteAccount: voteAccount.publicKey,
-            })
-            .signers()
-            .instruction();
+
+            const instruction = await SendVote(program.methods, proof_a, pi_b, pi_c, publicSignalsBuffer, voteAccount);
             transaction.add(instruction);
             const signature = await provider.sendAndConfirm(transaction);
         } catch (e) {
@@ -85,3 +57,8 @@ describe("voting_program", () => {
         }
     });
 });
+            /*transaction.add(
+                anchor.web3.ComputeBudgetProgram.setComputeUnitPrice({
+                    microLamports: 2
+                })
+            );*/
